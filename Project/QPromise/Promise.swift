@@ -93,7 +93,7 @@ public class Promise<T> {
 		return promise
 	}
 	
-	public func catch(onRejected: ((NSError)-> Promise<T>?)) -> Promise<T> {
+	public func catch(onRejected: ((NSError) -> Promise<T>?)) -> Promise<T> {
 		let promise = Promise<T>()
 		
 		defer({
@@ -134,6 +134,13 @@ public class Promise<T> {
 }
 
 public extension Promise {
+	public class func deferred<T>() -> (promise: Promise<T>, fulfill: (T) -> Void, reject: (NSError) -> Void, resolve: (Promise<T>) -> Void) {
+		let promise = Promise<T>()
+		return (promise, promise.fulfill, promise.reject, promise.resolve)
+	}
+}
+
+public extension Promise {
 	public class func fulfill<T>(value: T) -> Promise<T> {
 		return Promise<T>({fulfill, reject, resolve in
 			fulfill(value)
@@ -151,10 +158,30 @@ public extension Promise {
 			resolve(promise)
 		})
 	}
+}
 
-	public class func promise<T>() -> (Promise<T>, (T) -> Void, (NSError) -> Void, (Promise<T>) -> Void) {
-		let promise = Promise<T>()
-		return (promise, promise.fulfill, promise.reject, promise.resolve)
+public extension Promise {
+	public func then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil) -> Promise<Void> {
+		return then({ value -> Promise<Void> in
+			onFulfilled(value)
+			return Promise<Void>.fulfill()
+		}, { reason -> Promise<Void>? in
+			return onRejectedOrNil?(reason)
+		})
+	}
+	
+	public func catch(onRejected: ((NSError) -> Void)) -> Promise<T> {
+		return catch { reason -> Promise<T>? in
+			onRejected(reason)
+			return nil
+		}
+	}
+	
+	public func finally(onSettled: () -> Void) -> Promise<T> {
+		return finally { () -> Promise<T>? in
+			onSettled()
+			return nil
+		}
 	}
 }
 
