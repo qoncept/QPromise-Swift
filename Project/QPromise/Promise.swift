@@ -16,9 +16,13 @@ public class Promise<T> {
 	private convenience init() {
 		self.init({ (fulfill, reject, resolve) in })
 	}
+
+	public var settled: Bool {
+		return result != nil
+	}
 	
 	private func fulfill(value: T) {
-		if result != nil {
+		if settled {
 			fatalError("Illegal state.")
 		}
 
@@ -32,7 +36,7 @@ public class Promise<T> {
 	}
 	
 	private func reject(reason: NSError) {
-		if result != nil {
+		if settled {
 			fatalError("Illegal state.")
 		}
 
