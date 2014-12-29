@@ -45,6 +45,7 @@ class PromiseTests: XCTestCase {
 			XCTFail("Never reaches here.")
 			return Promise<Void>.reject(reason)
 		}).wait()
+		XCTAssert(reached, "")
 		
 		reached = false
 		asyncFail(error).then ({ value -> Promise<Void> in
@@ -123,14 +124,14 @@ class PromiseTests: XCTestCase {
 		var reach: Int
 		
 		reach = 0
-		asyncSucceed(1).finally { onSettled -> Void in
+		asyncSucceed(1).finally { () -> Void in
 			reach++
 			return
 		}.wait()
 		XCTAssertEqual(reach, 1, "")
 
 		reach = 0
-		asyncFail(NSError()).finally { onSettled -> Void in
+		asyncFail(NSError()).finally { () -> Void in
 			reach++
 			return
 		}.wait()
@@ -138,7 +139,7 @@ class PromiseTests: XCTestCase {
 		
 		// value fall through
 		reach = 0
-		asyncSucceed(0).finally { onSettled -> Void in
+		asyncSucceed(0).finally { () -> Void in
 			reach++
 			return
 		}.then { value -> Promise<Void> in
@@ -150,7 +151,7 @@ class PromiseTests: XCTestCase {
 		
 		// update value
 		reach = 0
-		asyncSucceed(0).finally { onSettled -> Promise<Int>? in
+		asyncSucceed(0).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncSucceed(100)
 		}.then { value -> Promise<Void> in
@@ -162,7 +163,7 @@ class PromiseTests: XCTestCase {
 
 		// recovery
 		reach = 0
-		asyncFail(error).finally { onSettled -> Promise<Int>? in
+		asyncFail(error).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncSucceed(100)
 		}.then { value -> Promise<Void> in
@@ -174,7 +175,7 @@ class PromiseTests: XCTestCase {
 
 		// reason fall through
 		reach = 0
-		asyncFail(error).finally { onSettled -> Void in
+		asyncFail(error).finally { () -> Void in
 			reach++
 			return
 		}.catch { reason -> Void in
@@ -186,7 +187,7 @@ class PromiseTests: XCTestCase {
 		
 		// new reason
 		reach = 0
-		asyncFail(error).finally { onSettled -> Promise<Int>? in
+		asyncFail(error).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncFail(error2)
 		}.catch { reason -> Promise<Int>? in
@@ -199,7 +200,7 @@ class PromiseTests: XCTestCase {
 		
 		// make fail
 		reach = 0
-		asyncSucceed(0).finally { onSettled -> Promise<Int>? in
+		asyncSucceed(0).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncFail(error)
 		}.catch { reason -> Promise<Int>? in
@@ -230,7 +231,7 @@ class PromiseTests: XCTestCase {
 		}.catch { reason -> Void in
 			XCTFail("Never reaches here.")
 			return
-		}.finally { onSettled -> Void in
+		}.finally { () -> Void in
 			reach++
 			return
 		}.wait()
@@ -250,7 +251,7 @@ class PromiseTests: XCTestCase {
 			reach++
 			XCTAssertEqual(reason, error, "")
 			return
-		}.finally { onSettled -> Void in
+		}.finally { () -> Void in
 			reach++
 			return
 		}.wait()
@@ -274,7 +275,7 @@ class PromiseTests: XCTestCase {
 		}.catch { reason -> Void in
 			XCTFail("Never reaches here.")
 			return
-		}.finally { onSettled -> Void in
+		}.finally { () -> Void in
 			reach++
 			return
 		}.wait()
