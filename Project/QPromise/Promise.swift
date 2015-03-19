@@ -10,7 +10,7 @@ public class Promise<T> {
 		fulfilledHandlers = []
 		rejectedHandlers = []
 		
-		executor(fulfill, reject, resolve)
+		executor(fulfill: fulfill, reject: reject, resolve: resolve)
 	}
 
 	private convenience init() {
