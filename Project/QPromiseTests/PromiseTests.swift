@@ -281,6 +281,47 @@ class PromiseTests: XCTestCase {
 		}.wait()
 		XCTAssertEqual(reach, 3, "")
 	}
+	
+	func testThenOverload() {
+		let error = NSError()
+		
+		//	then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil)
+		//	onRejectedOrNil is nil
+		let pr1 = asyncSucceed(0)
+			.then ({ value in
+					return Promise<Void>.fulfill()
+			})
+		pr1.wait()
+		
+		//	then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil)
+		//	onRejectedOrNil is not nil
+		let pr2 = asyncSucceed(0)
+			.then ({ value in
+				return Promise<Void>.fulfill()
+				}, { error in
+					return nil
+			})
+		pr2.wait()
+		
+		//	then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil)
+		//	onRejectedOrNil is nil
+		let pr3 = asyncSucceed(0)
+			.then ({ value in
+				return
+			})
+		pr3.wait()
+		
+		//	then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil)
+		//	onRejectedOrNil is not nil
+		let pr4 = asyncSucceed(0)
+			.then({ value in
+				return
+				}, { error in
+					return Promise<Void>.reject(NSError(domain: "HogeDomain", code: 1, userInfo: nil))
+			})
+		pr4.wait()
+	}
+
 }
 
 extension Promise {
