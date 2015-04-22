@@ -173,7 +173,7 @@ public extension Promise {
 		return then(onFulfilled, nil)
 	}
 	
-	public func then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)?) -> Promise<Void> {
+	public func then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>?)?) -> Promise<Void> {
 		return then({ value -> Promise<Void> in
 			onFulfilled(value)
 			return Promise<Void>.fulfill()
