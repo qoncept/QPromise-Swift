@@ -88,7 +88,7 @@ public class Promise<T> {
 		defer({
 			promise.resolve(onFulfilled($0))
 		}, {
-			onRejectedOrNil?($0).flatMap { promise.resolve($0) } ?? promise.reject($0)
+			onRejectedOrNil?($0).map { promise.resolve($0) } ?? promise.reject($0)
 		})
 
 		return promise
@@ -100,7 +100,7 @@ public class Promise<T> {
 		defer({
 			promise.fulfill($0)
 		}, {
-			onRejected($0).flatMap { promise.resolve($0) } ?? promise.reject($0)
+			onRejected($0).map { promise.resolve($0) } ?? promise.reject($0)
 		})
 		
 		return promise
@@ -110,9 +110,9 @@ public class Promise<T> {
 		let promise = Promise<T>()
 		
 		defer({ value in
-			onSettled().flatMap { promise.resolve($0) } ?? promise.fulfill(value)
+			onSettled().map { promise.resolve($0) } ?? promise.fulfill(value)
 		}, { error in
-			onSettled().flatMap { promise.resolve($0) } ?? promise.reject(error)
+			onSettled().map { promise.resolve($0) } ?? promise.reject(error)
 		})
 		
 		return promise
