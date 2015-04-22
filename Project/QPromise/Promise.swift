@@ -88,14 +88,7 @@ public class Promise<T> {
 		defer({
 			promise.resolve(onFulfilled($0))
 		}, {
-			if let onRejected = onRejectedOrNil {
-				if let recovery =  onRejected($0) {
-					promise.resolve(recovery)
-					return
-				}
-			}
-			
-			promise.reject($0)
+			onRejectedOrNil?($0).flatMap { promise.resolve($0) } ?? promise.reject($0)
 		})
 
 		return promise
@@ -107,12 +100,7 @@ public class Promise<T> {
 		defer({
 			promise.fulfill($0)
 		}, {
-			if let recovery =  onRejected($0) {
-				promise.resolve(recovery)
-				return
-			}
-			
-			promise.reject($0)
+			onRejected($0).flatMap { promise.resolve($0) } ?? promise.reject($0)
 		})
 		
 		return promise
@@ -121,20 +109,10 @@ public class Promise<T> {
 	public func finally(onSettled: () -> Promise<T>?) -> Promise<T> {
 		let promise = Promise<T>()
 		
-		defer({
-			if let update = onSettled() {
-				promise.resolve(update)
-				return
-			}
-			
-			promise.fulfill($0)
-		}, {
-			if let recovery = onSettled() {
-				promise.resolve(recovery)
-				return
-			}
-			
-			promise.reject($0)
+		defer({ value in
+			onSettled().flatMap { promise.resolve($0) } ?? promise.fulfill(value)
+		}, { error in
+			onSettled().flatMap { promise.resolve($0) } ?? promise.reject(error)
 		})
 		
 		return promise
