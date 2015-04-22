@@ -288,9 +288,9 @@ class PromiseTests: XCTestCase {
 		//	then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil)
 		//	onRejectedOrNil is nil
 		let pr1 = asyncSucceed(0)
-			.then ({ value in
-					return Promise<Void>.fulfill()
-			})
+			.then { value in
+				return Promise<Void>.fulfill()
+		}
 		pr1.wait()
 		
 		//	then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil)
@@ -306,15 +306,15 @@ class PromiseTests: XCTestCase {
 		//	then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil)
 		//	onRejectedOrNil is nil
 		let pr3 = asyncSucceed(0)
-			.then ({ value in
+			.then { value in
 				return
-			})
+		}
 		pr3.wait()
 		
 		//	then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil)
 		//	onRejectedOrNil is not nil
 		let pr4 = asyncSucceed(0)
-			.then({ value in
+			.then ({ value in
 				return
 				}, { error in
 					return Promise<Void>.reject(NSError(domain: "HogeDomain", code: 1, userInfo: nil))

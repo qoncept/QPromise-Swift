@@ -78,7 +78,11 @@ public class Promise<T> {
 		self.rejectedHandlers.append(rejectedHandler)
 	}
 
-	public func then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil) -> Promise<U> {
+	public func then<U>(onFulfilled: (T) -> Promise<U>) -> Promise<U> {
+		return then(onFulfilled, nil)
+	}
+	
+	public func then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)?) -> Promise<U> {
 		let promise = Promise<U>()
 		
 		defer({
@@ -165,7 +169,11 @@ public extension Promise {
 }
 
 public extension Promise {
-	public func then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)? = nil) -> Promise<Void> {
+	public func then(onFulfilled: (T) -> Void) -> Promise<Void> {
+		return then(onFulfilled, nil)
+	}
+	
+	public func then(onFulfilled: (T) -> Void, _ onRejectedOrNil: ((NSError) -> Promise<Void>)?) -> Promise<Void> {
 		return then({ value -> Promise<Void> in
 			onFulfilled(value)
 			return Promise<Void>.fulfill()
