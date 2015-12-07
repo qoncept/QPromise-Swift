@@ -33,7 +33,7 @@ class PromiseTests: XCTestCase {
 	}
 	
     func testThen() {
-		let error = NSError()
+		let error = NSError(domain: "", code: 0, userInfo: nil)
 		var reached: Bool
 
 		reached = false
@@ -60,16 +60,16 @@ class PromiseTests: XCTestCase {
     }
 	
 	func testCatch() {
-		let error = NSError()
+		let error = NSError(domain: "", code: 0, userInfo: nil)
 		var reach: Int
 
-		asyncSucceed(0).catch { reason -> Promise<Int>? in
+		asyncSucceed(0).`catch` { reason -> Promise<Int>? in
 			XCTFail("Never reaches here.")
 			return nil
 		}.wait()
 
 		reach = 0
-		asyncFail(error).catch { reason -> Promise<Int>? in
+		asyncFail(error).`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return nil
@@ -78,11 +78,11 @@ class PromiseTests: XCTestCase {
 		
 		// fall through
 		reach = 0
-		asyncFail(error).catch { reason -> Promise<Int>? in
+		asyncFail(error).`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return nil
-		}.catch { reason -> Promise<Int>? in
+		}.`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return nil
@@ -91,7 +91,7 @@ class PromiseTests: XCTestCase {
 		
 		// recovery
 		reach = 0
-		asyncFail(error).catch { reason -> Promise<Int>? in
+		asyncFail(error).`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return self.asyncSucceed(100)
@@ -103,13 +103,13 @@ class PromiseTests: XCTestCase {
 		XCTAssertEqual(reach, 2, "")
 		
 		// new reason
-		let error2 = NSError()
+		let error2 = NSError(domain: "", code: 1, userInfo: nil)
 		reach = 0
-		asyncFail(error).catch { reason -> Promise<Int>? in
+		asyncFail(error).`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return self.asyncFail(error2)
-		}.catch { reason -> Promise<Int>? in
+		}.`catch` { reason -> Promise<Int>? in
 			XCTAssertNotEqual(reason, error, "")
 			XCTAssertEqual(reason, error2, "")
 			reach++
@@ -119,8 +119,8 @@ class PromiseTests: XCTestCase {
 	}
 	
 	func testFinally() {
-		let error = NSError()
-		let error2 = NSError()
+		let error = NSError(domain: "", code: 0, userInfo: nil)
+		let error2 = NSError(domain: "", code: 1, userInfo: nil)
 		var reach: Int
 		
 		reach = 0
@@ -131,7 +131,7 @@ class PromiseTests: XCTestCase {
 		XCTAssertEqual(reach, 1, "")
 
 		reach = 0
-		asyncFail(NSError()).finally { () -> Void in
+		asyncFail(NSError(domain: "", code: 0, userInfo: nil)).finally { () -> Void in
 			reach++
 			return
 		}.wait()
@@ -178,7 +178,7 @@ class PromiseTests: XCTestCase {
 		asyncFail(error).finally { () -> Void in
 			reach++
 			return
-		}.catch { reason -> Void in
+		}.`catch` { reason -> Void in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return
@@ -190,7 +190,7 @@ class PromiseTests: XCTestCase {
 		asyncFail(error).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncFail(error2)
-		}.catch { reason -> Promise<Int>? in
+		}.`catch` { reason -> Promise<Int>? in
 			XCTAssertNotEqual(reason, error, "")
 			XCTAssertEqual(reason, error2, "")
 			reach++
@@ -203,7 +203,7 @@ class PromiseTests: XCTestCase {
 		asyncSucceed(0).finally { () -> Promise<Int>? in
 			reach++
 			return self.asyncFail(error)
-		}.catch { reason -> Promise<Int>? in
+		}.`catch` { reason -> Promise<Int>? in
 			XCTAssertEqual(reason, error, "")
 			reach++
 			return nil
@@ -212,7 +212,7 @@ class PromiseTests: XCTestCase {
 	}
 	
 	func testThenCatchAndFinally() {
-		let error = NSError()
+		let error = NSError(domain: "", code: 0, userInfo: nil)
 		var reach: Int
 
 		reach = 0
@@ -228,7 +228,7 @@ class PromiseTests: XCTestCase {
 			XCTAssertEqual(value, 3, "")
 			reach++
 			return
-		}).catch { reason -> Void in
+		}).`catch` { reason -> Void in
 			XCTFail("Never reaches here.")
 			return
 		}.finally { () -> Void in
@@ -247,7 +247,7 @@ class PromiseTests: XCTestCase {
 		}).then ({ value -> Promise<Void> in
 			XCTFail("Never reaches here.")
 			return Promise<Void>.fulfill()
-		}).catch { reason -> Void in
+		}).`catch` { reason -> Void in
 			reach++
 			XCTAssertEqual(reason, error, "")
 			return
@@ -272,7 +272,7 @@ class PromiseTests: XCTestCase {
 			XCTAssertEqual(value, 101, "")
 			reach++
 			return Promise<Void>.fulfill()
-		}).catch { reason -> Void in
+		}).`catch` { reason -> Void in
 			XCTFail("Never reaches here.")
 			return
 		}.finally { () -> Void in
@@ -283,8 +283,6 @@ class PromiseTests: XCTestCase {
 	}
 	
 	func testThenOverload() {
-		let error = NSError()
-		
 		//	then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)? = nil)
 		//	onRejectedOrNil is nil
 		let pr1 = asyncSucceed(0)

@@ -50,7 +50,7 @@ public class Promise<T> {
 	}
 	
 	private func resolve(promise: Promise<T>) {
-		promise.defer({
+		promise.`defer`({
 			self.fulfill($0)
 		}, {
 			self.reject($0)
@@ -62,7 +62,7 @@ public class Promise<T> {
 		rejectedHandlers = []
 	}
 	
-	private func defer(fulfilledHandler: (T) -> Void, _ rejectedHandler: (NSError) -> Void) {
+	private func `defer`(fulfilledHandler: (T) -> Void, _ rejectedHandler: (NSError) -> Void) {
 		if let result = self.result {
 			switch result {
 			case .Fulfilled(let value):
@@ -85,7 +85,7 @@ public class Promise<T> {
 	public func then<U>(onFulfilled: (T) -> Promise<U>, _ onRejectedOrNil: ((NSError) -> Promise<U>?)?) -> Promise<U> {
 		let promise = Promise<U>()
 		
-		defer({
+		`defer`({
 			promise.resolve(onFulfilled($0))
 		}, {
 			onRejectedOrNil?($0).map { promise.resolve($0) } ?? promise.reject($0)
@@ -94,10 +94,10 @@ public class Promise<T> {
 		return promise
 	}
 	
-	public func catch(onRejected: ((NSError) -> Promise<T>?)) -> Promise<T> {
+	public func `catch`(onRejected: ((NSError) -> Promise<T>?)) -> Promise<T> {
 		let promise = Promise<T>()
 		
-		defer({
+		`defer`({
 			promise.fulfill($0)
 		}, {
 			onRejected($0).map { promise.resolve($0) } ?? promise.reject($0)
@@ -109,7 +109,7 @@ public class Promise<T> {
 	public func finally(onSettled: () -> Promise<T>?) -> Promise<T> {
 		let promise = Promise<T>()
 		
-		defer({ value in
+		`defer`({ value in
 			onSettled().map { promise.resolve($0) } ?? promise.fulfill(value)
 		}, { error in
 			onSettled().map { promise.resolve($0) } ?? promise.reject(error)
@@ -160,8 +160,8 @@ public extension Promise {
 		})
 	}
 	
-	public func catch(onRejected: ((NSError) -> Void)) -> Promise<T> {
-		return catch { reason -> Promise<T>? in
+	public func `catch`(onRejected: ((NSError) -> Void)) -> Promise<T> {
+		return `catch` { reason -> Promise<T>? in
 			onRejected(reason)
 			return nil
 		}
